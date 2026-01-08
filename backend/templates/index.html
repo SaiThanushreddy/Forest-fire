@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almora Forest Fire Prediction System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="fire-icon">
+                <div class="flame"></div>
+                <div class="flame"></div>
+                <div class="flame"></div>
+            </div>
+            <h2>Initializing Fire Prediction System</h2>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar glass-morphism">
+        <div class="nav-brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+            </div>
+            <span class="brand-text">FireSight AI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link active">Home</a>
+            <a href="/prediction" class="nav-link">Prediction</a>
+            <a href="/simulation" class="nav-link">Simulation</a>
+            <a href="/analytics" class="nav-link">Analytics</a>
+            <a href="/map" class="nav-link">Map</a>
+        </div>
+        <div class="nav-status">
+            <div class="status-indicator online"></div>
+            <span>System Online</span>
+        </div>
+    </nav>
+
+    <!-- Hero Section with 3D Globe -->
+    <section class="hero">
+        <div id="globe-container" class="globe-container"></div>
+        <div class="hero-content">
+            <div class="hero-badge glass-morphism">
+                <span class="badge-pulse"></span>
+                AI-Powered Fire Detection
+            </div>
+            <h1 class="hero-title">
+                <span class="title-line">Forest Fire</span>
+                <span class="title-line gradient-text">Prediction System</span>
+            </h1>
+            <p class="hero-subtitle">
+                Advanced CNN-LSTM deep learning model for predicting and simulating
+                forest fire spread in Almora, Uttarakhand
+            </p>
+            <div class="hero-buttons">
+                <a href="/prediction" class="btn btn-primary">
+                    <span>Start Prediction</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="/simulation" class="btn btn-secondary glass-morphism">
+                    <span>View Simulation</span>
+                </a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card glass-morphism" data-aos="fade-up">
+                    <div class="stat-icon fire-icon-small">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 23c-4.97 0-9-3.58-9-8 0-4.5 4-8.5 4-12 0 3.5 3 5 3 5s-1-2.5 1-5c2 2.5 5 4 5 8 0 1-.5 2-1 3 1-1 2-2.5 2-4.5 0 5-2 6.5-2 6.5s2-1 3-4c0 5.5-3 11-6 11z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="total-fires">---</div>
+                    <div class="stat-label">Fire Incidents Analyzed</div>
+                    <div class="stat-bar">
+                        <div class="stat-progress" style="width: 75%"></div>
+                    </div>
+                </div>
+                <div class="stat-card glass-morphism" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-icon accuracy-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="accuracy">---%</div>
+                    <div class="stat-label">Model Accuracy</div>
+                    <div class="stat-bar">
+                        <div class="stat-progress accuracy-bar" style="width: 85%"></div>
+                    </div>
+                </div>
+                <div class="stat-card glass-morphism" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-icon data-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M3 9h18M9 21V9"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="total-samples">---</div>
+                    <div class="stat-label">Training Samples</div>
+                    <div class="stat-bar">
+                        <div class="stat-progress data-bar" style="width: 90%"></div>
+                    </div>
+                </div>
+                <div class="stat-card glass-morphism" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-icon region-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                    </div>
+                    <div class="stat-value">Almora</div>
+                    <div class="stat-label">Target Region</div>
+                    <div class="stat-bar">
+                        <div class="stat-progress region-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title">
+                <span class="title-decoration"></span>
+                System Capabilities
+                <span class="title-decoration"></span>
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card glass-morphism">
+                    <div class="feature-3d" id="feature-cnn"></div>
+                    <div class="feature-content">
+                        <h3>CNN-LSTM Model</h3>
+                        <p>TimeDistributed convolutional layers extract spatial features from satellite imagery, while LSTM layers capture temporal fire patterns over 5-day sequences.</p>
+                        <div class="feature-tech">
+                            <span class="tech-tag">TensorFlow</span>
+                            <span class="tech-tag">Keras</span>
+                            <span class="tech-tag">Deep Learning</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-card glass-morphism">
+                    <div class="feature-3d" id="feature-ca"></div>
+                    <div class="feature-content">
+                        <h3>Cellular Automata</h3>
+                        <p>Grid-based fire spread simulation considering wind direction, vegetation density (NDVI), temperature (LST), and neighboring cell states.</p>
+                        <div class="feature-tech">
+                            <span class="tech-tag">NumPy</span>
+                            <span class="tech-tag">Simulation</span>
+                            <span class="tech-tag">Physics-based</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-card glass-morphism">
+                    <div class="feature-3d" id="feature-sat"></div>
+                    <div class="feature-content">
+                        <h3>Satellite Data</h3>
+                        <p>NDVI (vegetation index) and LST (land surface temperature) satellite imagery processed for fire risk assessment and prediction.</p>
+                        <div class="feature-tech">
+                            <span class="tech-tag">NDVI</span>
+                            <span class="tech-tag">LST</span>
+                            <span class="tech-tag">64x64 Grid</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-card glass-morphism">
+                    <div class="feature-3d" id="feature-viz"></div>
+                    <div class="feature-content">
+                        <h3>3D Visualization</h3>
+                        <p>Interactive Three.js-powered 3D terrain visualization with real-time fire spread animation and risk heatmaps.</p>
+                        <div class="feature-tech">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                            <span class="tech-tag">Interactive</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack -->
+    <section class="tech-section">
+        <div class="container">
+            <h2 class="section-title">
+                <span class="title-decoration"></span>
+                Technology Stack
+                <span class="title-decoration"></span>
+            </h2>
+            <div class="tech-orbit">
+                <div class="orbit-center">
+                    <span>AI</span>
+                </div>
+                <div class="orbit-ring orbit-1">
+                    <div class="orbit-item" style="--i:0"><span>TensorFlow</span></div>
+                    <div class="orbit-item" style="--i:1"><span>Keras</span></div>
+                    <div class="orbit-item" style="--i:2"><span>NumPy</span></div>
+                    <div class="orbit-item" style="--i:3"><span>Pandas</span></div>
+                </div>
+                <div class="orbit-ring orbit-2">
+                    <div class="orbit-item" style="--i:0"><span>Flask</span></div>
+                    <div class="orbit-item" style="--i:1"><span>Three.js</span></div>
+                    <div class="orbit-item" style="--i:2"><span>Chart.js</span></div>
+                    <div class="orbit-item" style="--i:3"><span>Folium</span></div>
+                    <div class="orbit-item" style="--i:4"><span>Python</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-card glass-morphism">
+                <div class="cta-content">
+                    <h2>Ready to Predict Fire Risks?</h2>
+                    <p>Use our AI-powered system to analyze fire risks and simulate fire spread scenarios in real-time.</p>
+                </div>
+                <div class="cta-buttons">
+                    <a href="/prediction" class="btn btn-primary btn-large">
+                        Launch Prediction
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer glass-morphism">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="brand-text">FireSight AI</span>
+                    <p>Almora Forest Fire Prediction System</p>
+                </div>
+                <div class="footer-links">
+                    <a href="/prediction">Prediction</a>
+                    <a href="/simulation">Simulation</a>
+                    <a href="/analytics">Analytics</a>
+                    <a href="/map">Map</a>
+                </div>
+                <div class="footer-info">
+                    <p>CNN-LSTM Deep Learning Model</p>
+                    <p>Almora, Uttarakhand, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Forest Fire Prediction System | Group 04</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/globe.js"></script>
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Hide loader after animation
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 2000);
+
+            // Initialize 3D globe
+            initGlobe('globe-container');
+
+            // Load stats
+            try {
+                const response = await fetch('/api/analytics');
+                const data = await response.json();
+                if (data.success) {
+                    animateNumber('total-fires', data.total_fires);
+                    animateNumber('total-samples', data.total_records);
+                    document.getElementById('accuracy').textContent =
+                        (data.training_stats?.model_accuracy || 85).toFixed(1) + '%';
+                }
+            } catch (e) {
+                console.log('Stats loading:', e);
+            }
+        });
+
+        function animateNumber(id, target) {
+            const el = document.getElementById(id);
+            let current = 0;
+            const increment = Math.ceil(target / 50);
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                el.textContent = current.toLocaleString();
+            }, 30);
+        }
+    </script>
+</body>
+</html>

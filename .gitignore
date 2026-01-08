@@ -1,0 +1,22 @@
+# Virtual environments
+venv/
+forest_fire_env/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+.next/
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+.DS_Store
+*.log
+.env
+
+# Large model files
+*.keras
+*.h5

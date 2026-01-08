@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Prediction | FireSight AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="page-prediction">
+    <!-- Navigation -->
+    <nav class="navbar glass-morphism">
+        <div class="nav-brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+            </div>
+            <span class="brand-text">FireSight AI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/prediction" class="nav-link active">Prediction</a>
+            <a href="/simulation" class="nav-link">Simulation</a>
+            <a href="/analytics" class="nav-link">Analytics</a>
+            <a href="/map" class="nav-link">Map</a>
+        </div>
+        <div class="nav-status">
+            <div class="status-indicator online"></div>
+            <span>Model Ready</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="prediction-main">
+        <div class="prediction-container">
+            <!-- Left Panel - Controls -->
+            <aside class="control-panel glass-morphism">
+                <h2 class="panel-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    Prediction Controls
+                </h2>
+
+                <div class="control-group">
+                    <label class="control-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2"/>
+                            <path d="M16 2v4M8 2v4M3 10h18"/>
+                        </svg>
+                        Select Date
+                    </label>
+                    <input type="date" id="prediction-date" class="control-input" value="2023-06-15">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        Prediction Horizon
+                    </label>
+                    <select id="horizon" class="control-input">
+                        <option value="1">1 Day Ahead</option>
+                        <option value="3">3 Days Ahead</option>
+                        <option value="7">7 Days Ahead</option>
+                    </select>
+                </div>
+
+                <button id="predict-btn" class="btn btn-primary btn-full">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M12 22V12"/>
+                    </svg>
+                    Generate Prediction
+                </button>
+
+                <!-- Risk Gauge -->
+                <div class="risk-gauge-container">
+                    <h3 class="gauge-title">Fire Risk Level</h3>
+                    <div class="risk-gauge">
+                        <svg viewBox="0 0 200 120" class="gauge-svg">
+                            <defs>
+                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#4ade80"/>
+                                    <stop offset="50%" style="stop-color:#fbbf24"/>
+                                    <stop offset="100%" style="stop-color:#ef4444"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#333" stroke-width="15" stroke-linecap="round"/>
+                            <path id="gauge-fill" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGradient)" stroke-width="15" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251"/>
+                            <circle id="gauge-needle" cx="100" cy="100" r="8" fill="#ff6b6b"/>
+                            <text x="100" y="85" text-anchor="middle" class="gauge-value" id="gauge-text">--</text>
+                            <text x="100" y="110" text-anchor="middle" class="gauge-label" id="gauge-label">Awaiting Prediction</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Stats Panel -->
+                <div class="stats-panel">
+                    <div class="stat-item">
+                        <span class="stat-name">Average Risk</span>
+                        <span class="stat-value" id="avg-risk">--%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">Max Risk</span>
+                        <span class="stat-value" id="max-risk">--%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-name">High Risk Cells</span>
+                        <span class="stat-value" id="high-risk-cells">--</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center - 3D Visualization -->
+            <section class="visualization-panel">
+                <div class="viz-header glass-morphism">
+                    <h2>3D Fire Risk Terrain</h2>
+                    <div class="viz-controls">
+                        <button class="viz-btn" id="toggle-wireframe" title="Toggle Wireframe">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
+                            </svg>
+                        </button>
+                        <button class="viz-btn" id="reset-camera" title="Reset Camera">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 109-9 9 9 0 00-9 9z"/>
+                                <path d="M12 8v4l2 2"/>
+                            </svg>
+                        </button>
+                        <button class="viz-btn" id="toggle-animation" title="Toggle Animation">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="terrain-container" class="terrain-container"></div>
+                <div class="viz-legend">
+                    <span class="legend-item"><span class="legend-color" style="background: #22c55e"></span>Low Risk</span>
+                    <span class="legend-item"><span class="legend-color" style="background: #eab308"></span>Moderate</span>
+                    <span class="legend-item"><span class="legend-color" style="background: #f97316"></span>High</span>
+                    <span class="legend-item"><span class="legend-color" style="background: #ef4444"></span>Extreme</span>
+                </div>
+            </section>
+
+            <!-- Right Panel - 2D Heatmap -->
+            <aside class="heatmap-panel glass-morphism">
+                <h2 class="panel-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18M9 3v18"/>
+                    </svg>
+                    2D Risk Heatmap
+                </h2>
+                <div class="heatmap-container">
+                    <canvas id="heatmap-canvas" width="256" height="256"></canvas>
+                </div>
+                <div class="heatmap-info">
+                    <div class="info-item">
+                        <span class="info-label">Grid Size</span>
+                        <span class="info-value">64 x 64</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Location</span>
+                        <span class="info-value">Almora, UK</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Coordinates</span>
+                        <span class="info-value">29.60N, 79.66E</span>
+                    </div>
+                </div>
+                <div class="color-scale">
+                    <div class="scale-bar"></div>
+                    <div class="scale-labels">
+                        <span>0%</span>
+                        <span>50%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Fire Particles Overlay -->
+    <div id="fire-particles" class="fire-particles"></div>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/prediction.js"></script>
+</body>
+</html>
